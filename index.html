@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Armand Tomaszewski — Data Analyst RH</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #150f09;
+    --paper: #ede3cf;
+    --paper-dark: #e2d5bb;
+    --accent: #9e4220;
+    --accent-light: #be5c30;
+    --gold: #b87c32;
+    --muted: #7d6a50;
+    --rule: #c8b490;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Libre Baskerville', Georgia, serif; overflow-x: hidden; cursor: none; }
+
+  /* CURSOR */
+  .cursor { position: fixed; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease; }
+  .cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid var(--accent); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform 0.18s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease; opacity: 0.5; }
+  @media (hover: hover) and (pointer: fine) {
+    body:has(a:hover) .cursor { width: 6px; height: 6px; background: var(--gold); }
+    body:has(a:hover) .cursor-ring { width: 52px; height: 52px; opacity: 0.8; border-color: var(--gold); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cursor, .cursor-ring { display: none; }
+    body { cursor: auto; }
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 3rem;
+    background: rgba(14,13,11,0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.04em; color: var(--paper); text-decoration: none; transition: opacity 0.2s; }
+  .nav-logo:hover { opacity: 0.7; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,232,0.5); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a:focus-visible { color: var(--gold); }
+
+  /* HERO */
+  .hero { min-height: 100vh; position: relative; display: flex; align-items: center; justify-content: flex-end; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: url('lyon.png') left 32% / cover no-repeat; }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(14,13,11,0.22) 0%, rgba(14,13,11,0.42) 100%); }
+  .hero-content { position: relative; z-index: 2; padding: 6rem 4rem; max-width: 620px; }
+  .hero-tag { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--paper); margin-bottom: 1.6rem; display: flex; align-items: center; gap: 0.8rem; text-shadow: 0 1px 6px rgba(0,0,0,0.7); }
+  .hero-tag::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--paper); }
+  .hero-name { font-family: 'Playfair Display', serif; font-size: clamp(3.2rem, 6vw, 5.5rem); font-weight: 900; line-height: 1.0; margin-bottom: 0.4rem; color: var(--paper); text-shadow: 0 2px 24px rgba(14,13,11,0.55), 0 1px 4px rgba(14,13,11,0.4); }
+  .hero-name em { font-style: italic; color: var(--gold); }
+  .hero-subtitle { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1rem, 1.8vw, 1.25rem); color: var(--paper); margin-bottom: 0; line-height: 1.65; max-width: 50ch; text-shadow: 0 1px 12px rgba(14,13,11,0.6); opacity: 0.92; }
+
+  /* PHOTO SECTION BANNER */
+  .section-photo { height: 400px; position: relative; overflow: hidden; cursor: pointer; user-select: none; transition: height 0.6s cubic-bezier(0.4,0,0.2,1); border-top: 1px solid rgba(184,124,50,0.35); }
+  .section-photo.expanded { height: 640px; }
+  .section-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+  .section-photo-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(14,13,11,0.08) 0%, rgba(14,13,11,0.80) 100%); }
+  .section-photo-label { position: absolute; bottom: 3rem; left: 4rem; }
+  .section-photo-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; line-height: 1.05; color: var(--paper); text-shadow: 0 2px 20px rgba(14,13,11,0.5); }
+  .section-photo-title em { font-style: italic; color: var(--gold); }
+  .toggle-btn {
+    position: absolute; top: 2rem; right: 4rem;
+    width: 2.6rem; height: 2.6rem;
+    border: 1px solid rgba(245,240,232,0.45);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 1.3rem; line-height: 1;
+    color: var(--paper);
+    transition: background 0.25s, border-color 0.25s, transform 0.35s;
+    pointer-events: none;
+    background: rgba(14,13,11,0.3);
+    backdrop-filter: blur(4px);
+  }
+  .section-photo:hover .toggle-btn { background: rgba(184,124,50,0.2); border-color: var(--gold); color: var(--gold); }
+  .toggle-btn.open { transform: rotate(45deg); }
+
+  @keyframes heroDrift {
+    0%   { transform: scale(1)    translate(0, 0); }
+    33%  { transform: scale(1.06) translate(-0.8%, 0.4%); }
+    66%  { transform: scale(1.04) translate(0.6%, -0.5%); }
+    100% { transform: scale(1)    translate(0, 0); }
+  }
+  @keyframes imgDrift {
+    0%   { transform: scale(1.01) translate(0, 0); }
+    40%  { transform: scale(1.05) translate(-1%, 0.5%); }
+    75%  { transform: scale(1.03) translate(0.8%, -0.4%); }
+    100% { transform: scale(1.01) translate(0, 0); }
+  }
+  .hero-bg { animation: heroDrift 28s ease-in-out infinite; }
+  .section-photo img { animation: imgDrift 22s ease-in-out infinite; will-change: transform; }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg, .section-photo img { animation: none; }
+  }
+
+  /* COLLAPSIBLE SECTIONS */
+  .section-content { overflow: hidden; max-height: 6000px; opacity: 1; transition: max-height 0.65s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease; }
+  .section-content.collapsed { max-height: 0; opacity: 0; }
+
+  /* SECTION BASE */
+  section, .section-block { padding: 6rem 4rem; }
+  .section-rule { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 3rem; }
+  .section-rule::before, .section-rule::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+  .section-rule-text { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  .section-header { margin-bottom: 4rem; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 900; line-height: 1.1; }
+
+  /* INFO ROWS (formation list) */
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 1.3rem 1.6rem; background: rgba(255,255,255,0.04); border-left: 3px solid transparent; transition: border-color 0.2s, background 0.2s; }
+  @media (hover: hover) and (pointer: fine) {
+    .info-row:hover { border-color: var(--gold); background: rgba(255,255,255,0.08); }
+  }
+  .info-row-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--paper); margin-bottom: 0.3rem; }
+  .info-row-sub { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,240,232,0.4); }
+  .info-row-arrow { color: var(--gold); font-size: 0.85rem; }
+
+  /* PROJECT CARDS */
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); }
+  .project-card { background: var(--paper); padding: 2.4rem; cursor: pointer; position: relative; overflow: hidden; transition: background 0.25s ease; }
+  .project-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease; }
+  @media (hover: hover) and (pointer: fine) {
+    .project-card:hover { background: var(--ink); }
+    .project-card:hover * { color: var(--paper) !important; }
+    .project-card:hover .project-tag { background: rgba(255,255,255,0.1) !important; color: var(--paper) !important; }
+    .project-card:hover::after { transform: scaleX(1); background: var(--gold); }
+    .project-card:hover .project-arrow { opacity: 1; transform: translate(0,0); }
+  }
+  .project-card:active { transform: scale(0.995); }
+  .project-tag { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); background: rgba(158,66,32,0.08); padding: 0.3rem 0.7rem; margin-bottom: 1.4rem; }
+  .project-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.8rem; color: var(--ink); }
+  .project-desc { font-size: 0.85rem; line-height: 1.75; color: var(--muted); margin-bottom: 1.6rem; }
+  .project-meta { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; }
+  .project-arrow { opacity: 0; transform: translate(-4px,4px); transition: opacity 0.25s, transform 0.25s; font-size: 1.1rem; }
+
+  /* TINTED SECTION — COMPÉTENCES & OUTILS */
+  #outils { background: #2a1608; }
+  #outils .project-card { background: #47280f; }
+  @media (hover: hover) and (pointer: fine) {
+    #outils .project-card:hover { background: #593410; }
+  }
+  #outils .project-title { color: var(--paper); }
+  #outils .project-desc { color: rgba(237,220,195,0.7); }
+  #outils .project-tag { color: #e0a860; background: rgba(200,140,60,0.15); }
+  #outils .project-meta { color: rgba(237,220,195,0.45); border-top-color: rgba(237,220,195,0.12); }
+  @media (hover: hover) and (pointer: fine) {
+    #outils .project-card:hover .project-tag { background: rgba(255,255,255,0.08) !important; color: var(--paper) !important; }
+  }
+
+  /* STATS STRIP */
+  .stats-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); margin-bottom: 3rem; }
+  .stat-card { background: rgba(255,255,255,0.04); padding: 1.6rem; position: relative; overflow: hidden; transition: transform 0.25s ease, background 0.25s ease; }
+  @media (hover: hover) and (pointer: fine) {
+    .stat-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.08); }
+  }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+  .stat-card:nth-child(2)::before { background: var(--gold); }
+  .stat-card:nth-child(3)::before { background: #c47a3a; }
+  .stat-card:nth-child(4)::before { background: #a85c30; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; color: var(--paper); line-height: 1; margin-bottom: 0.4rem; }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(237,227,207,0.5); }
+
+  /* FEATURED — MÉMOIRE */
+  .featured-block { background: var(--ink); color: var(--paper); padding: 6rem 4rem; position: relative; overflow: hidden; }
+  .featured-block::before { content: ''; position: absolute; top: -3rem; right: -3rem; width: 500px; height: 500px; background: radial-gradient(circle, rgba(184,124,50,0.09) 0%, transparent 65%); pointer-events: none; }
+  .fp-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; margin-top: 4rem; position: relative; }
+  .fp-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  .fp-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 900; line-height: 1.1; color: var(--paper); }
+  .fp-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 2rem 0 1.5rem; }
+  .fp-tag { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.28rem 0.65rem; border: 1px solid rgba(184,124,50,0.35); color: var(--gold); }
+  .fp-text h3 { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; color: var(--paper); margin-bottom: 1.4rem; line-height: 1.35; }
+  .fp-text p { font-size: 0.9rem; line-height: 1.88; color: rgba(245,240,232,0.68); margin-bottom: 1.3rem; }
+  .fp-text a { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); text-decoration: none; margin-top: 1rem; transition: gap 0.2s; }
+  .fp-text a:hover { gap: 0.9rem; }
+  .fp-data { display: flex; flex-direction: column; gap: 1px; background: rgba(255,255,255,0.06); }
+  .fp-row { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 1.6rem; background: rgba(255,255,255,0.03); border-left: 3px solid transparent; transition: border-color 0.2s, background 0.2s; }
+  @media (hover: hover) and (pointer: fine) {
+    .fp-row:hover { border-color: var(--gold); background: rgba(255,255,255,0.06); }
+  }
+  .fp-key { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,240,232,0.4); }
+  .fp-val { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--paper); text-align: right; }
+  .fp-val.accent { color: var(--gold); }
+
+  /* SKILLS GRID (profil section) */
+  .skills-grid-dark { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,0.06); margin-top: 1.2rem; }
+  .skill-item-dark { background: rgba(255,255,255,0.04); padding: 1.4rem; }
+  .skill-name-dark { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.6rem; }
+  .skill-list-dark { font-size: 0.82rem; line-height: 1.6; color: rgba(245,240,232,0.75); }
+
+  /* CONTACT */
+  .contact-block { padding: 3rem; background: var(--ink); color: var(--paper); max-width: 480px; }
+  .contact-block h3 { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.4rem; margin-bottom: 0.8rem; }
+  .contact-block p { font-size: 0.85rem; color: rgba(245,240,232,0.6); line-height: 1.7; margin-bottom: 2rem; }
+  .contact-email { font-family: 'DM Mono', monospace; font-size: 0.9rem; color: var(--gold); text-decoration: none; display: block; margin-bottom: 0.6rem; transition: opacity 0.2s; }
+  .contact-email:hover { opacity: 0.7; }
+  .contact-phone { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: rgba(245,240,232,0.55); text-decoration: none; display: block; margin-bottom: 2rem; transition: color 0.2s; }
+  .contact-phone:hover { color: var(--paper); }
+  .contact-links { display: flex; flex-direction: column; gap: 0.8rem; }
+  .contact-links a { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,240,232,0.5); text-decoration: none; display: flex; align-items: center; gap: 0.8rem; transition: color 0.2s; }
+  .contact-links a::before { content: '→'; color: var(--accent); }
+  .contact-links a:hover { color: var(--paper); }
+
+  /* FOOTER */
+  footer { background: var(--ink); color: rgba(245,240,232,0.3); padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center; font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; border-top: 1px solid rgba(255,255,255,0.05); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(14,13,11,0.85); z-index: 500; backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 2rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--paper); max-width: 680px; width: 100%; max-height: 80vh; overflow-y: auto; position: relative; animation: modalIn 0.3s ease; }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-header { background: var(--ink); padding: 2.4rem 2.4rem 2rem; position: sticky; top: 0; z-index: 1; }
+  .modal-tag { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--paper); line-height: 1.25; }
+  .modal-close { position: absolute; top: 1.4rem; right: 1.6rem; background: none; border: none; color: rgba(245,240,232,0.4); font-size: 1.4rem; cursor: none; transition: color 0.2s; line-height: 1; }
+  .modal-close:hover { color: var(--paper); }
+  .modal-body { padding: 2.4rem; }
+  .modal-body p { font-size: 0.9rem; line-height: 1.85; color: var(--muted); margin-bottom: 1.4rem; }
+  .modal-body p strong { color: var(--ink); }
+  .modal-body .modal-link { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--accent); color: var(--paper); text-decoration: none; font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.8rem 1.6rem; margin-top: 0.5rem; transition: background 0.2s; }
+  .modal-body .modal-link:hover { background: var(--accent-light); }
+  .modal-kv { display: flex; flex-direction: column; gap: 1px; background: var(--rule); margin-bottom: 1.8rem; }
+  .modal-kv-row { display: flex; background: var(--paper-dark); padding: 0.8rem 1.2rem; gap: 2rem; }
+  .modal-kv-key { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); min-width: 100px; }
+  .modal-kv-val { font-size: 0.85rem; color: var(--ink); }
+
+  /* ANIMATIONS */
+  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in { transition: opacity 0.3s ease; transform: none !important; }
+    .fade-in.visible { transform: none !important; }
+    .modal { animation: none; }
+  }
+
+  @media (max-width: 900px) {
+    .hero-content { padding: 6rem 1.5rem 4rem; }
+    .fp-inner { grid-template-columns: 1fr; gap: 3rem; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section, .section-block, .featured-block { padding: 4rem 1.5rem; }
+    .section-photo { height: 300px; }
+    .section-photo.expanded { height: 460px; }
+    .section-photo-label { left: 1.5rem; bottom: 2rem; }
+    .toggle-btn { right: 1.5rem; top: 1.5rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">A. Tomaszewski</a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="expandAndScroll('section-profil'); return false;">Profil</a></li>
+    <li><a href="#" onclick="expandAndScroll('section-parcours'); return false;">Parcours</a></li>
+    <li><a href="#" onclick="expandAndScroll('section-outils'); return false;">Outils</a></li>
+    <li><a href="#" onclick="expandAndScroll('section-contact'); return false;">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO — lyon.png full bleed -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content fade-in">
+    <div class="hero-tag">Data Analyst RH</div>
+    <h1 class="hero-name">Armand<br><em>Tomaszewski</em></h1>
+    <p class="hero-subtitle">Concevoir et déployer des outils d'aide à la décision RH fiables, afin de fournir aux managers des données claires et pertinentes pour soutenir leurs décisions.</p>
+  </div>
+</div>
+
+<!-- PHOTO BANNER 1 — paris.png (profil) -->
+<div class="section-photo" data-section="section-profil" onclick="toggleSection('section-profil')">
+  <img src="paris.png" alt="Profil">
+  <div class="section-photo-overlay"></div>
+  <div class="section-photo-label fade-in">
+    <h2 class="section-photo-title">Découvrir <em>mon profil</em></h2>
+  </div>
+  <div class="toggle-btn" id="toggle-section-profil">+</div>
+</div>
+
+<div class="section-content collapsed" id="section-profil">
+<section style="background:var(--ink); color:var(--paper);">
+  <div class="section-rule"><span class="section-rule-text" style="color:rgba(245,240,232,0.3);">Profil & Formation</span></div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:start;" class="fade-in">
+
+    <!-- Profil texte -->
+    <div>
+      <div class="fp-eyebrow">Profil</div>
+      <p style="font-size:0.95rem; line-height:1.85; color:rgba(245,240,232,0.75); margin-top:1rem;">Data Analyst RH au périmètre Groupe chez Rexel, après un passage en contrôle de gestion sociale et en RH opérationnelle. Un profil qui allie la rigueur du chiffre — Excel avancé, Power BI, Qlik — à la compréhension fine des sujets sociaux : effectifs, rémunération, absentéisme, conformité réglementaire.</p>
+      <p style="font-size:0.88rem; line-height:1.85; color:rgba(245,240,232,0.45); margin-top:0.9rem; font-style:italic;">Bilingue anglais.</p>
+
+      <div style="margin-top:2.5rem;">
+        <div class="fp-eyebrow" style="margin-bottom:0;">Compétences</div>
+        <div class="skills-grid-dark">
+          <div class="skill-item-dark">
+            <div class="skill-name-dark">Analyse RH</div>
+            <div class="skill-list-dark">Transformer des bases de données brutes en indicateurs sociaux clairs et prêts à l'emploi, puis les analyser pour en dégager des tendances et des recommandations</div>
+          </div>
+          <div class="skill-item-dark">
+            <div class="skill-name-dark">Data</div>
+            <div class="skill-list-dark">Excel (TCD, formules avancées & VBA), Power BI, Qlik & Business Intelligence</div>
+          </div>
+          <div class="skill-item-dark">
+            <div class="skill-name-dark">SIRH</div>
+            <div class="skill-list-dark">SAP SuccessFactors, SAP GlobalView, ADP HRI, Business Objects</div>
+          </div>
+          <div class="skill-item-dark">
+            <div class="skill-name-dark">Langues</div>
+            <div class="skill-list-dark">Français (natif), Anglais (bilingue)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formation -->
+    <div>
+      <div class="fp-eyebrow" style="margin-bottom:1.4rem;">Formation</div>
+      <div style="display:flex; flex-direction:column; gap:1px; background:rgba(255,255,255,0.06);">
+        <div class="info-row">
+          <div>
+            <div class="info-row-title">Master RHO — Management des Ressources Humaines</div>
+            <div class="info-row-sub">IAE Lyon · 2022 – 2024</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div>
+            <div class="info-row-title">Licence MSH — Gestion</div>
+            <div class="info-row-sub">IAE Lyon · 2019 – 2022</div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:0.82rem; line-height:1.8; color:rgba(245,240,232,0.5); margin-top:1.4rem;">Mémoire de Master : « Compétence collective dans les Centres de Services Partagés à l'étranger : intérêts & opportunités ».</p>
+    </div>
+
+  </div>
+</section>
+</div><!-- /section-content profil -->
+
+<!-- PHOTO BANNER 2 — turin.png (parcours) -->
+<div class="section-photo expanded" data-section="section-parcours" onclick="toggleSection('section-parcours')">
+  <img src="turin.png" alt="Parcours">
+  <div class="section-photo-overlay"></div>
+  <div class="section-photo-label fade-in">
+    <h2 class="section-photo-title">Piloter par la <em>donnée</em></h2>
+  </div>
+  <div class="toggle-btn open" id="toggle-section-parcours">+</div>
+</div>
+
+<div class="section-content" id="section-parcours">
+
+<section id="parcours" style="background:var(--ink);">
+  <div class="section-rule" style="margin-bottom:3rem;"><span class="section-rule-text" style="color:rgba(245,240,232,0.3);">Expérience professionnelle</span></div>
+  <div class="section-header fade-in">
+    <h2 class="section-title" style="color:var(--paper);">Parcours<br>RH & Data</h2>
+  </div>
+  <div class="stats-strip fade-in">
+    <div class="stat-card">
+      <div class="stat-num">27K+</div>
+      <div class="stat-label">Salariés — périmètre Groupe Rexel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">17</div>
+      <div class="stat-label">Pays consolidés, 30+ entités</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">160K€</div>
+      <div class="stat-label">Recouvrés, litiges indemnités CPAM</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">IA</div>
+      <div class="stat-label">Guide de prompts rédigé pour le Groupe</div>
+    </div>
+  </div>
+  <div class="projects-grid">
+    <div class="project-card fade-in" onclick="openModal('rexelData')">
+      <span class="project-tag">Rexel · Périmètre Groupe</span>
+      <h3 class="project-title">Data Analyst RH</h3>
+      <p class="project-desc">Consolidation et fiabilisation des données HSE pour le Comité Exécutif, reportings URD/CSRD, et conception d'un guide de prompts pour favoriser l'adoption de l'IA dans les différents pays du Groupe.</p>
+      <div class="project-meta"><span>Paris · Depuis 06/2026</span><span class="project-arrow">↗</span></div>
+    </div>
+    <div class="project-card fade-in" style="transition-delay:0.1s" onclick="openModal('rexelCGS')">
+      <span class="project-tag">Rexel · Périmètre France</span>
+      <h3 class="project-title">Contrôleur de Gestion Sociale</h3>
+      <p class="project-desc">Tableaux de bord sur les indicateurs sociaux (effectifs, absentéisme, turnover, parité), traitement des NAO et de l'intéressement, rapports BI sous ADP HRI.</p>
+      <div class="project-meta"><span>Lyon · 06/2025 – 04/2026</span><span class="project-arrow">↗</span></div>
+    </div>
+    <div class="project-card fade-in" style="transition-delay:0.2s" onclick="openModal('boehringer')">
+      <span class="project-tag">Boehringer Ingelheim</span>
+      <h3 class="project-title">Chargé de Mission RH</h3>
+      <p class="project-desc">Traitement de litiges liés aux indemnités de congé maladie impayées, coordination avec la CPAM et des employés à l'étranger, calcul des soldes de tout compte sur SAP GlobalView.</p>
+      <div class="project-meta"><span>Lyon · 09/2023 – 10/2024</span><span class="project-arrow">↗</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED — MÉMOIRE -->
+<div class="featured-block fade-in">
+  <div class="section-rule" style="margin-bottom:0;">
+    <span class="section-rule-text" style="color:rgba(245,240,232,0.3);">Focus, mémoire de recherche</span>
+  </div>
+  <div style="margin-top:3rem; position:relative;">
+    <div class="fp-eyebrow">Mémoire de Master</div>
+    <h2 class="fp-title">Compétence collective<br>dans les CSP à l'étranger</h2>
+  </div>
+  <div class="fp-inner">
+    <div class="fp-text">
+      <div class="fp-tags">
+        <span class="fp-tag">IAE Lyon</span>
+        <span class="fp-tag">Master RHO</span>
+        <span class="fp-tag">CSP à l'étranger</span>
+        <span class="fp-tag">Théorie des organisations</span>
+        <span class="fp-tag">2022–2024</span>
+      </div>
+      <h3>« Comment la compétence collective se construit-elle à distance ? »</h3>
+      <p>Le mémoire de fin de Master interroge un angle mort fréquent des Centres de Services Partagés (CSP) délocalisés à l'étranger : la capacité collective des équipes à produire ensemble, au-delà de la seule performance individuelle mesurée par les indicateurs RH classiques.</p>
+      <p>Il croise théorie des organisations et retour de terrain pour identifier les leviers concrets — formation, circulation de l'information, reconnaissance — qui transforment un centre de coûts délocalisé en pôle de compétence réel.</p>
+      <a href="#" onclick="openModal('memoire'); return false;">Lire la synthèse →</a>
+    </div>
+    <div class="fp-data">
+      <div class="fp-row"><span class="fp-key">Cadre</span><span class="fp-val">Mémoire de recherche</span></div>
+      <div class="fp-row"><span class="fp-key">École</span><span class="fp-val accent">IAE Lyon</span></div>
+      <div class="fp-row"><span class="fp-key">Diplôme</span><span class="fp-val">Master RHO</span></div>
+      <div class="fp-row"><span class="fp-key">Sujet</span><span class="fp-val">CSP à l'étranger</span></div>
+      <div class="fp-row"><span class="fp-key">Période</span><span class="fp-val">2022 – 2024</span></div>
+      <div class="fp-row"><span class="fp-key">Langue</span><span class="fp-val accent">FR</span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /section-content parcours -->
+
+<!-- PHOTO BANNER 3 — hyere.png (outils) -->
+<div class="section-photo" data-section="section-outils" onclick="toggleSection('section-outils')">
+  <img src="hyere.png" alt="Compétences & outils">
+  <div class="section-photo-overlay"></div>
+  <div class="section-photo-label fade-in">
+    <h2 class="section-photo-title">Maîtriser les <em>outils</em></h2>
+  </div>
+  <div class="toggle-btn" id="toggle-section-outils">+</div>
+</div>
+
+<div class="section-content collapsed" id="section-outils">
+
+<section id="outils">
+  <div class="section-rule"><span class="section-rule-text" style="color:rgba(224,168,96,0.5);">Compétences & outils</span></div>
+  <div class="section-header fade-in">
+    <h2 class="section-title" style="color:var(--paper);">Data &<br>Outils RH</h2>
+  </div>
+  <div class="projects-grid">
+    <div class="project-card fade-in" onclick="openModal('excel')">
+      <span class="project-tag">Excel · VBA</span>
+      <h3 class="project-title">Excel avancé</h3>
+      <p class="project-desc">Création et mise à jour d'outils de reporting et d'analyse de données via des tableaux croisés dynamiques, formules avancées et macros VBA.</p>
+      <div class="project-meta"><span>Très bon niveau</span><span class="project-arrow">↗</span></div>
+    </div>
+    <div class="project-card fade-in" style="transition-delay:0.1s" onclick="openModal('bi')">
+      <span class="project-tag">Power BI · Qlik</span>
+      <h3 class="project-title">Visualisation & reporting</h3>
+      <p class="project-desc">Conception de dashboards Power BI et Qlik pour le suivi des KPI sociaux et la mise à disposition de données auprès des directions et des élus du personnel.</p>
+      <div class="project-meta"><span>Outils BI</span><span class="project-arrow">↗</span></div>
+    </div>
+    <div class="project-card fade-in" style="transition-delay:0.2s" onclick="openModal('sirh')">
+      <span class="project-tag">SIRH</span>
+      <h3 class="project-title">SAP · ADP · Business Objects</h3>
+      <p class="project-desc">Requêtage Business Intelligence HRI ADP, expérience SAP SuccessFactors et SAP GlobalView pour la gestion de la paie et des données sociales.</p>
+      <div class="project-meta"><span>Systèmes RH</span><span class="project-arrow">↗</span></div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /section-content outils -->
+
+<!-- PHOTO BANNER 4 — lyon.png reused (contact) -->
+<div class="section-photo" data-section="section-contact" onclick="toggleSection('section-contact')">
+  <img src="lyon.png" alt="Prendre contact">
+  <div class="section-photo-overlay"></div>
+  <div class="section-photo-label fade-in">
+    <h2 class="section-photo-title">Prendre <em>contact</em></h2>
+  </div>
+  <div class="toggle-btn" id="toggle-section-contact">+</div>
+</div>
+
+<div class="section-content collapsed" id="section-contact">
+
+<div class="section-block" id="contact">
+  <div class="fade-in">
+    <div class="contact-block">
+      <h3>Prendre contact</h3>
+      <a href="mailto:armand.tomaszewski@outlook.fr" class="contact-email">armand.tomaszewski@outlook.fr</a>
+      <a href="tel:+33751600451" class="contact-phone">07 51 60 04 51</a>
+      <div class="contact-links">
+        <a href="https://www.linkedin.com/in/armand-t/" target="_blank">Profil LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /section-content contact -->
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Armand Tomaszewski</span>
+  <span>Data Analyst RH · Reporting Social · SIRH</span>
+</footer>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modalContent">
+    <div class="modal-header">
+      <div class="modal-tag" id="modalTag"></div>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <button class="modal-close" onclick="closeModalDirect()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  setTimeout(() => {
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+  }, 60);
+});
+
+// Collapsible photo-banner sections
+function toggleSection(id) {
+  const content = document.getElementById(id);
+  const btn = document.getElementById('toggle-' + id);
+  const banner = document.querySelector('[data-section="' + id + '"]');
+  const collapsed = content.classList.toggle('collapsed');
+  btn.classList.toggle('open', !collapsed);
+  banner.classList.toggle('expanded', !collapsed);
+}
+function expandAndScroll(id) {
+  const content = document.getElementById(id);
+  const banner = document.querySelector('[data-section="' + id + '"]');
+  if (content.classList.contains('collapsed')) toggleSection(id);
+  setTimeout(() => banner.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Modal data
+const projects = {
+  rexelData: {
+    tag: 'Rexel · Data Analyst RH · Périmètre Groupe',
+    title: 'Data Analyst RH — Périmètre Groupe',
+    kv: [
+      ['Entreprise', 'Rexel'],
+      ['Lieu', 'Paris, France'],
+      ['Période', '06/2026 – Aujourd\'hui'],
+      ['Périmètre', '+27 000 salariés · 30+ entités · 17 pays'],
+    ],
+    body: `<p>Consolider, fiabiliser et analyser <strong>les données HSE</strong> pour éclairer les décisions stratégiques du Comité Exécutif, en produisant des KPIs, des slides PowerPoint et des analyses de tendances avec Excel et Power BI (+27 000 salariés).</p>
+    <p>Coordonner la collecte trimestrielle et annuelle des données extra-financières et accompagner les contributeurs locaux afin de garantir la fiabilité des chiffres publiés annuellement par le Groupe (+ de 30 entités dans 17 pays).</p>
+    <p>Préparer et fournir des données sociales et leurs justifications associées dans le cadre des <strong>reportings URD et CSRD</strong>.</p>
+    <p>Concevoir un guide de rédaction de prompts destiné à favoriser l'adoption des outils IA dans les différents pays.</p>`,
+  },
+  rexelCGS: {
+    tag: 'Rexel · Contrôleur de Gestion Sociale · Périmètre France',
+    title: 'Contrôleur de Gestion Sociale — Périmètre France',
+    kv: [
+      ['Entreprise', 'Rexel'],
+      ['Lieu', 'Lyon, France'],
+      ['Période', '06/2025 – 04/2026'],
+      ['Périmètre', '+5 000 salariés'],
+    ],
+    body: `<p>Produire des <strong>tableaux de bord Excel</strong> détaillés sur des indicateurs sociaux (effectifs, salaires, absentéisme, turnover, accidents de travail, ancienneté, parité) destinés au pilotage interne ou aux élus du personnel (+5 000 salariés).</p>
+    <p>Consolider et traiter les données de paie dans le cadre des <strong>NAO</strong>, de la participation et de l'intéressement.</p>
+    <p>Créer des rapports BI (Business Intelligence) à partir du logiciel ADP HRI afin de répondre aux sollicitations RH.</p>
+    <p>Mettre en place un suivi et quantifier la politique nationale d'alternance de l'entreprise via Excel et Business Objects.</p>
+    <p>Préparer et analyser des données afin d'anticiper les exigences réglementaires (CSRD, Transparence des rémunérations).</p>`,
+  },
+  boehringer: {
+    tag: 'Boehringer Ingelheim · Chargé de Mission RH',
+    title: 'Chargé de Mission RH',
+    kv: [
+      ['Entreprise', 'Boehringer Ingelheim'],
+      ['Lieu', 'Lyon, France'],
+      ['Période', '09/2023 – 10/2024'],
+    ],
+    body: `<p>Traiter les litiges liés aux indemnités de congé maladie impayées des deux années précédentes, en identifiant les causes et en collaborant avec des employés à l'étranger et avec la CPAM (<strong>recouvrement de 160 000€</strong>).</p>
+    <p>Calculer et préparer les soldes de tout compte des salariés sur le départ, avec SAP GlobalView et Excel.</p>`,
+  },
+  memoire: {
+    tag: 'Mémoire · Master RHO · IAE Lyon',
+    title: 'Compétence collective dans les CSP à l\'étranger',
+    kv: [
+      ['École', 'IAE Lyon'],
+      ['Diplôme', 'Master RHO'],
+      ['Période', '2022 – 2024'],
+      ['Langue', 'Français'],
+    ],
+    body: `<p>Le mémoire interroge un angle mort fréquent des Centres de Services Partagés (CSP) délocalisés à l'étranger : la capacité collective des équipes à produire ensemble, au-delà de la seule performance individuelle mesurée par les indicateurs RH classiques.</p>
+    <p>Il croise théorie des organisations et retour de terrain pour identifier les leviers concrets — formation, circulation de l'information, reconnaissance — qui transforment un centre de coûts délocalisé en pôle de compétence réel.</p>`,
+  },
+  excel: {
+    tag: 'Excel · VBA',
+    title: 'Excel avancé',
+    kv: [
+      ['Niveau', 'Très bon niveau'],
+      ['Outils', 'TCD · Formules avancées · VBA'],
+    ],
+    body: `<p>Création et mise à jour d'outils de reporting et d'analyse de données via des tableaux croisés dynamiques, des formules avancées et des macros VBA — utilisés au quotidien chez Rexel pour le pilotage RH et social.</p>`,
+  },
+  bi: {
+    tag: 'Power BI · Qlik',
+    title: 'Visualisation & reporting',
+    kv: [
+      ['Outils', 'Power BI · Qlik'],
+      ['Usage', 'KPI sociaux · Dashboards de pilotage'],
+    ],
+    body: `<p>Visualisation et mise à jour des données via Power BI et Qlik, pour un pilotage social lisible par les directions et les représentants du personnel.</p>`,
+  },
+  sirh: {
+    tag: 'SIRH',
+    title: 'SAP · ADP · Business Objects',
+    kv: [
+      ['Outils', 'SAP SuccessFactors · SAP GlobalView'],
+      ['Outils', 'ADP HRI · Business Objects'],
+    ],
+    body: `<p>Requêteur Business Intelligence HRI ADP. Expérience avec SAP SuccessFactors & GlobalView pour la gestion de la paie, des soldes de tout compte et des données sociales consolidées à l'échelle Groupe.</p>`,
+  },
+};
+
+function openModal(id) {
+  const p = projects[id];
+  if (!p) return;
+  document.getElementById('modalTag').textContent = p.tag;
+  document.getElementById('modalTitle').textContent = p.title;
+  let kv = '<div class="modal-kv">';
+  p.kv.forEach(([k, v]) => { kv += `<div class="modal-kv-row"><span class="modal-kv-key">${k}</span><span class="modal-kv-val">${v}</span></div>`; });
+  kv += '</div>';
+  document.getElementById('modalBody').innerHTML = kv + p.body;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+</script>
+</body>
+</html>
